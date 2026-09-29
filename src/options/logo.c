@@ -169,8 +169,9 @@ bool ffOptionsParseLogoCommandLine(FFOptionsLogo* options, const char* key, cons
                 options->cache = ffOptionParseBoolean(value) ? FF_LOGO_CACHE_ON : FF_LOGO_CACHE_OFF;
             }
         } else if (ffStrEqualsIgnCase(subKey, "recache")) {
-            fputs("--logo-recache has been replaced by --logo-cache regen\n", stderr);
-            exit(477);
+            /* Backwards-compatible alias: --logo-recache -> --logo-cache regen */
+            fputs("Warning: --logo-recache is deprecated; use --logo-cache regen\n", stderr);
+            options->cache = FF_LOGO_CACHE_REGEN;
         } else if (ffStrEqualsIgnCase(subKey, "separate")) {
             fputs("--logo-separate has been renamed to --logo-position\n", stderr);
             exit(477);
@@ -412,9 +413,9 @@ const char* ffOptionsParseLogoJsonConfig(FFOptionsLogo* options, yyjson_val* roo
             }
             continue;
         } else if (unsafe_yyjson_equals_str(key, "recache")) {
-            // Kept as a named rejection so the message points at the replacement, which the generic
-            // "Unknown logo key" below can not do.
-            return "Property 'logo.recache' has been replaced by 'logo.cache' with the value \"regen\"";
+            /* Backwards-compatible alias: treat 'recache' as 'cache' = "regen" */
+            options->cache = FF_LOGO_CACHE_REGEN;
+            continue;
         } else if (unsafe_yyjson_equals_str(key, "position")) {
             int value;
             const char* error = ffJsonConfigParseEnum(val, &value, (FFKeyValuePair[]) {

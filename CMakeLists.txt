@@ -2397,6 +2397,15 @@ if (BUILD_TESTS)
         PRIVATE libfastfetch
     )
 
+    add_executable(fastfetch-test-logo-config
+        tests/config_logo_recache.c
+    )
+    target_link_libraries(fastfetch-test-logo-config
+        PRIVATE libfastfetch
+    )
+
+    add_test(NAME test-logo-config COMMAND fastfetch-test-logo-config)
+
     enable_testing()
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
         add_test(NAME test-cpu COMMAND fastfetch-test-cpu)
